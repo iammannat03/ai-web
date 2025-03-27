@@ -10,7 +10,7 @@ const Sidebar = ({ setMessages }: Props) => {
     <div className="w-[280px] bg-black p-4 py-10 flex flex-col max-lg:hidden border-r border-white/10">
       <div className="flex items-center w-full justify-center mb-6">
         <h1 className="text-4xl text-white font-extrabold">
-          RagChatbot
+          VIT.AI
         </h1>
       </div>
 

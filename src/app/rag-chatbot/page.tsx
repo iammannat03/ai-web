@@ -3,14 +3,34 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import ReactMarkdown from "react-markdown";
-import { sendMessageAction } from "@/actions/rag-chatbot.action"; // Import the server action
-import { useTransition } from "react"; // Import useTransition
+import { sendMessageAction } from "@/actions/rag-chatbot.action";
+import { useTransition } from "react";
 import Sidebar from "@/components/rag-chatbot/Sidebar";
+
+interface Message {
+  id: string;
+  text: string;
+  sender: "user" | "bot";
+}
 
 const ChatPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [isPending, startTransition] = useTransition(); //useTransition hook
+  const [isPending, startTransition] = useTransition();
+
+  const formatMessage = (text: string) => {
+    // First remove any quotes and trim whitespace
+    const cleanText = text.replace(/^'|'$/g, "").trim();
+
+    // Replace literal "\n" strings with actual newlines
+    const withNewlines = cleanText.replace(/\\n/g, "\n");
+
+    // Now split on actual newlines and format
+    return withNewlines
+      .split("\n")
+      .filter((line) => line.trim() !== "")
+      .join("\n\n");
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -32,12 +52,24 @@ const ChatPage = () => {
 
     startTransition(async () => {
       try {
-        const botResponse = await sendMessageAction(
-          userMessage
-        ); // Call the server action
+        const botResponse = await sendMessageAction({
+          message: newMessage,
+          output_type: "chat",
+          input_type: "chat",
+        });
+
+        if (botResponse.error) {
+          throw new Error(botResponse.message);
+        }
+
         const botMessage: Message = {
           id: uuidv4(),
-          text: botResponse as any, // as string
+          text:
+            typeof botResponse.text === "string"
+              ? formatMessage(botResponse.text)
+              : formatMessage(
+                  JSON.stringify(botResponse.text)
+                ),
           sender: "bot",
         };
         setMessages((prevMessages) => [
@@ -49,12 +81,12 @@ const ChatPage = () => {
           "Error calling server action:",
           error
         );
-        const errorMessage = {
+        const errorMessage: Message = {
           id: uuidv4(),
-          text: "Error processing message",
+          text: "[Error processing message]",
           sender: "bot",
         };
-        setMessages((prevMessages: any) => [
+        setMessages((prevMessages) => [
           ...prevMessages,
           errorMessage,
         ]);
@@ -64,16 +96,27 @@ const ChatPage = () => {
 
   useEffect(() => {
     const initRes = async () => {
-      const initRes = await sendMessageAction(
-        "Just give a brief introduction about yourself. Remember you are a fine-tuned model of Gemini but fine tuned by Mannat named Jignes and you are fine tuned to be a brainrot AI Bot." as any // as string
-      );
-      setMessages([
-        {
-          id: uuidv4(),
-          text: initRes as any,
-          sender: "bot",
-        },
-      ]);
+      const botResponse = await sendMessageAction({
+        message:
+          "Give a brief introduction of what you are",
+        output_type: "chat",
+        input_type: "chat",
+      });
+
+      if (!botResponse.error) {
+        setMessages([
+          {
+            id: uuidv4(),
+            text:
+              typeof botResponse.message === "string"
+                ? formatMessage(botResponse.message)
+                : formatMessage(
+                    JSON.stringify(botResponse.text)
+                  ),
+            sender: "bot",
+          },
+        ]);
+      }
     };
     initRes();
   }, []);
@@ -88,11 +131,11 @@ const ChatPage = () => {
         {messages.length === 0 && (
           <div className="flex-1 py-4 px-8 border-white overflow-y-auto flex justify-center">
             <div className=" w-full h-full flex flex-col justify-center items-center lg:w-[800px]">
-              <div className="text-center text-2xl font-bold">
-                Welcome to Skibbidi.AI
+              <div className="text-center text-2xl font-bold text-white">
+                Welcome to VIT.AI
               </div>
               <span className="text-sm text-gray-500">
-                start a conversation with me
+                start a conversation here
               </span>
             </div>
           </div>
@@ -109,20 +152,20 @@ const ChatPage = () => {
                 }`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-3 py-2 ${
+                  className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
                     message.sender === "user"
                       ? "bg-black border border-white/20 text-white"
                       : "bg-black border border-white/40 text-white"
                   }`}
                 >
                   <ReactMarkdown>
-                    {message.text}
+                    {formatMessage(message.text)}
                   </ReactMarkdown>
                 </div>
               </div>
             ))}
             {isPending && (
-              <div className="loader text-white text-xl">
+              <div className="loader font-bold text-white text-xl">
                 Processing...
               </div>
             )}
@@ -136,7 +179,7 @@ const ChatPage = () => {
               type="text"
               value={newMessage}
               onChange={handleInputChange}
-              className="w-full rounded-2xl p-4 pr-12 bg-white/10 border-white/10 text-white focus-visible:outline-none border "
+              className="w-full rounded-2xl p-4 pr-12 text-sm bg-white/10 border-white/10 text-white focus-visible:outline-none border "
               placeholder="What's in your mind?"
               onKeyDown={(e) => {
                 if (e.key === "Enter") sendMessage();
