@@ -20,7 +20,10 @@ const ChatPage = () => {
 
   const formatMessage = (text: string) => {
     // First remove any quotes and trim whitespace
-    const cleanText = text.replace(/^'|'$/g, "").trim();
+    const cleanText = text
+      .replace(/^'|'$/g, "")
+      .trim()
+      .replace(/^"|"$/g, "");
 
     // Replace literal "\n" strings with actual newlines
     const withNewlines = cleanText.replace(/\\n/g, "\n");
