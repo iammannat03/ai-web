@@ -5,7 +5,7 @@ import { Upload } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { generateImageCaption } from "@/actions/image-captioning.action";
-
+import GoToHomePage from "@/components/common/GoToHomePage";
 export default function ImageCaptioning() {
   const [caption, setCaption] = useState("");
   const [loading, setLoading] = useState(false);
@@ -111,8 +111,9 @@ export default function ImageCaptioning() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-black">
-      <div className="flex flex-col items-center justify-center gap-y-5">
-        <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center w-xl">
+        <GoToHomePage />
+        <div className="flex flex-col items-center justify-center mb-5">
           <h1 className="text-4xl font-bold text-white">
             Image Captioning Tool
           </h1>
