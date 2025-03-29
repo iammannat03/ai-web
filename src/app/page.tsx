@@ -20,17 +20,12 @@ const projects: Project[] = [
     link: "/rag-chatbot",
   },
   {
-    title: "AI-Powered Chatbot",
-    description:
-      "Intelligent conversational agent using OpenAI's API for natural interactions.",
-    link: "https://ai-powered-chatbot.com",
-  },
-  {
     title: "Sentiment Analysis Tool",
     description:
       "NLP-powered analysis of user comments and reviews using advanced language models.",
-    link: "https://sentiment-analysis-tool.com",
+    link: "/sentiment-analysis-tool",
   },
+
   // ... Add more projects as needed
 ];
 
