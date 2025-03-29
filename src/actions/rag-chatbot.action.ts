@@ -39,7 +39,7 @@ export const sendMessageAction = async (
     const data = await response.json();
     const messageRes =
       data.outputs[0].outputs[0].results.message.data;
-    console.log(`Received response:`, messageRes);
+    console.log(`Received response:`, data);
 
     return messageRes;
   } catch (error) {

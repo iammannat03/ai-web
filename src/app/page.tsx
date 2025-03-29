@@ -25,6 +25,12 @@ const projects: Project[] = [
       "NLP-powered analysis of user comments and reviews using advanced language models.",
     link: "/sentiment-analysis-tool",
   },
+  {
+    title: "Image Captioning Tool",
+    description:
+      "Generate captions for images using a pre-trained model.",
+    link: "/image-captioning-tool",
+  },
 
   // ... Add more projects as needed
 ];
