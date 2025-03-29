@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { generateImageCaption } from "@/actions/image-captioning.action";
 
 export default function ImageCaptioning() {
   const [caption, setCaption] = useState("");
@@ -57,7 +58,6 @@ export default function ImageCaptioning() {
 
     setLoading(true);
     const formData = new FormData();
-    // Get the file from the input element
     const fileInput = document.getElementById(
       "image-upload"
     ) as HTMLInputElement;
@@ -68,16 +68,13 @@ export default function ImageCaptioning() {
     formData.append("file", file);
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/generate-caption",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const result = await generateImageCaption(formData);
 
-      const data = await response.json();
-      setCaption(data.caption);
+      if (result.error) {
+        throw new Error(result.message);
+      }
+
+      setCaption(result.caption);
     } catch (error) {
       console.error("Error:", error);
     } finally {
