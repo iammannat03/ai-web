@@ -59,8 +59,8 @@ const Page = () => {
           AI Solutions Hub
         </h1>
         <p className="text-lg max-sm:text-base text-gray-300 max-w-2xl text-center">
-          Pushing AI boundaries—from chatbots to medical
-          diagnostics. Explore our cutting-edge solutions.
+          These are some of my AI+Web projects. I'll keep
+          adding more as I learn new stuffs
         </p>
       </section>
 
